@@ -12,7 +12,7 @@
 
 ---
 
-### 1.2 [Profiling](./02_branch_and_bound/exercises/01_profiling_exercise/)
+### 1.2 [Profiling](./01_cpsat/exercises/01_profiling_exercise/)
 
 **Objective**:
 
