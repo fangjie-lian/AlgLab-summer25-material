@@ -60,7 +60,7 @@ complete each sheet may vary; for example, you might spend more time on the
 initial sheet and less on subsequent ones, or vice versa, depending on your
 familiarity with the topics covered.
 
-> [!INFO]
+> [!NOTE]
 >
 > The schedule is subject to change. The dates are tentative and may be adjusted
 > based on the progress of the course. If you struggle with a sheet, please
