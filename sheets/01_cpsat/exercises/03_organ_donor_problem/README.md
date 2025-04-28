@@ -81,7 +81,7 @@ constraints are satisfied.
 >
 > To further simplify, we can focus solely on recipients by creating a node for
 > each recipient and defining directed edges only between recipients. An edge
-> from $r_i to $r_j$ exists if a partner of $r_i$, denoted as $d_k$, is
+> from $r_i$ to $r_j$ exists if a partner of $r_i$, denoted as $d_k$, is
 > compatible with $r_j$​. We store the partner $d_k$ as an attribute of the edge
 > $(r_i, r_j)$, e.g., with a dictionary. In this representation, any directed
 > cycle in the graph corresponds to a valid transplantation cycle. This
