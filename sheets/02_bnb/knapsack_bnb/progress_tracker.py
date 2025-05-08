@@ -97,7 +97,7 @@ class ProgressTracker:
         lb = self.lower_bound()
         print(
             f"{self.num_iterations:5d} {explored:7d}/{total:<6d}{depth:6d} "
-            f"{status.value:>13} {val:7.1} {ub:7.1f} {lb:7.1f}"
+            f"{status.value:>13} {val:7.1f} {ub:7.1f} {lb:7.1f}"
         )
         # Visualization callback
         self._vis.on_node_processed(
