@@ -41,7 +41,7 @@ class RelaxedSolution:
 
         # Validate consistency: bound must exceed or equal actual value.
         actual = self.value()
-        if self.upper_bound>=0 and self.upper_bound < actual - 1e-8:
+        if self.upper_bound >= 0 and self.upper_bound < actual - 1e-8:
             raise ValueError(
                 f"Actual value {actual} exceeds upper_bound {self.upper_bound}."
             )

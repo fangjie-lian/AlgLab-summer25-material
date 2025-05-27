@@ -1,6 +1,6 @@
 # Sheet 04: (Mixed) Integer (Linear) Programming
 
-_Algorithms Lab Winter 2024/2025 - Dr. Dominik Krupke, TU Braunschweig, IBR,
+_Algorithms Lab Summer 2025 - Dr. Dominik Krupke, TU Braunschweig, IBR,
 Algorithms Group_
 
 The oldest and most common technique for solving NP-hard optimization problems
@@ -498,7 +498,7 @@ model.addConstr(x <= y)
 model.addConstr(x <= 1 - y)
 
 # IMPLICATION (x AND y IMPLIES z)
-model.addConstr(x + y <= 2 * z)
+model.addConstr(x + y <= 1 + z)
 ```
 
 ### Forcing a Variable to Zero Under Certain Conditions

@@ -29,7 +29,11 @@ def get_edge_weight(weighted_graph: ProblemInstance, u: str, v: str) -> int:
 
 def build_weighted_graph(instance: ProblemInstance) -> nx.Graph:
     """Build a NetworkX graph from the problem instance so we can use its shortest path implementation."""
-    logging.info("Building weighted graph with %d nodes and %d edges", len(instance.endpoints), len(instance.connections))
+    logging.info(
+        "Building weighted graph with %d nodes and %d edges",
+        len(instance.endpoints),
+        len(instance.connections),
+    )
     G = nx.Graph()
 
     # Add all endpoints as nodes in the graph

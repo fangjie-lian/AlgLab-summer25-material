@@ -146,6 +146,14 @@ is more!
   introduction to the field of optimization. It gives you a lot of the ideas
   that allow us to solve NP-hard problems in practice, while also gently
   introducing you to the way of thinking of an optimization expert.
+- [Hands-On Mathematical Optimization with Python](https://www.cambridge.org/us/universitypress/subjects/mathematics/optimization-or-and-risk-analysis/hands-mathematical-optimization-python?format=PB&isbn=9781009493505):
+  This book is a great introduction to mathematical optimization with Python,
+  including content that is not covered in this course, such as optimization
+  under uncertainty. However, its focus is on general mathematical optimization and
+  less on combinatorial optimization, i.e., a lot of the content considers
+  continuous variables. While it may not help you directly with the exercises
+  in this course, it is a great resource if you want to get a broader view on
+  optimization.
 
 ## Found an error?
 

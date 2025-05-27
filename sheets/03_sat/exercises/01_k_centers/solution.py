@@ -23,7 +23,9 @@ class Distances:
         # Compute all-pairs shortest paths
         self._distances = dict(nx.all_pairs_dijkstra_path_length(self.graph))
         # Log the computation details
-        logging.info("Computed all-pairs shortest paths for %d nodes", len(self._distances))
+        logging.info(
+            "Computed all-pairs shortest paths for %d nodes", len(self._distances)
+        )
 
     def all_vertices(self) -> Iterable[NodeId]:
         """Returns an iterable of all node IDs in the graph."""
@@ -48,7 +50,12 @@ class Distances:
             for dist_dict in self._distances.values()
             for dist in dist_dict.values()
         )
-        logging.info("Collected and sorted %d pairwise distances with a range from %f to %f", len(dists), dists[0], dists[-1])
+        logging.info(
+            "Collected and sorted %d pairwise distances with a range from %f to %f",
+            len(dists),
+            dists[0],
+            dists[-1],
+        )
         return dists
 
 
@@ -89,8 +96,11 @@ class KCentersSolver:
         self.graph = graph
         # Initialize distances helper
         self.distances = Distances(self.graph)
-        logging.info("KCentersSolver initialized with graph of %d nodes and %d edges", 
-                     self.graph.number_of_nodes(), self.graph.number_of_edges())
+        logging.info(
+            "KCentersSolver initialized with graph of %d nodes and %d edges",
+            self.graph.number_of_nodes(),
+            self.graph.number_of_edges(),
+        )
 
     def solve_heur(self, k: int) -> list[NodeId]:
         """

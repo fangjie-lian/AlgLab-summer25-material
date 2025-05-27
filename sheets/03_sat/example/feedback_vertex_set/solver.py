@@ -109,9 +109,9 @@ class FeedbackVertexSetDecisionVariant:
             timer.check()  # throws TimeoutError if time is up
             # Retrieve the solution from the solver.
             model = self.solver.get_model()
-            assert (
-                model is not None
-            ), "We expect a solution. Otherwise, we would have had a timeout."
+            assert model is not None, (
+                "We expect a solution. Otherwise, we would have had a timeout."
+            )
             feedback_nodes = self.node_vars.get_node_selection(model)
             # get subgraph induced by the graph excluding the feedback nodes
             subgraph = self.graph.copy()
