@@ -79,12 +79,12 @@ class Instance(BaseModel):
             t.source in self.locations and t.target in self.locations
             for t in self.tunnels
         ), "All tunnel endpoints must be locations."
-        assert all(m.location in self.locations for m in self.mines.values()), (
-            "All mine locations must be locations."
-        )
-        assert all(m.location == location for location, m in self.mines.items()), (
-            "Location of mine should match the key"
-        )
+        assert all(
+            m.location in self.locations for m in self.mines.values()
+        ), "All mine locations must be locations."
+        assert all(
+            m.location == location for location, m in self.mines.items()
+        ), "Location of mine should match the key"
         return self
 
 

@@ -46,10 +46,10 @@ NP-hard challenges effectively.
 
 ## Content
 
-This class consists of a series of exercise sheets. These exercises are carefully crafted to
-either introduce you to new techniques or enhance your existing knowledge of
-them. Designed with a hands-on approach, these tasks aim to provide you with
-practical exposure to relevant tools and methodologies.
+This class consists of a series of exercise sheets. These exercises are
+carefully crafted to either introduce you to new techniques or enhance your
+existing knowledge of them. Designed with a hands-on approach, these tasks aim
+to provide you with practical exposure to relevant tools and methodologies.
 
 Each exercise sheet is allocated a two-week completion window. However, with new
 sheets released on a weekly basis, you effectively have one week to work on each
@@ -67,16 +67,14 @@ familiarity with the topics covered.
 > reach out to us. We are happy to help you and can adjust the schedule if
 > necessary.
 
-|                  Sheet                  |           Time           |                                                                                                                                                 Content                                                                                                                                                 |
-| :-------------------------------------: | :----------------------: | :-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+|                  Sheet                  |          Time           |                                                                                                                                                 Content                                                                                                                                                 |
+| :-------------------------------------: | :---------------------: | :-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | [Exercise Sheet 1A](./sheets/01_cpsat/) | 2025-04-07 - 2025-04-22 |                                                                                        Constraint Programming with CP-SAT - A Hello-World with CP-SAT, NetworkX, and Scalene. All nice and easy to get started.                                                                                         |
 | [Exercise Sheet 1B](./sheets/01_cpsat/) | 2025-04-07 - 2025-04-29 |                                     Constraint Programming with CP-SAT - Here you will explore the use of CP-SAT, a declarative constraint programming solver. You will learn to define your problem mathematically, allowing CP-SAT to efficiently find solutions.                                     |
 |   [Exercise Sheet 2](./sheets/02_bnb)   | 2025-04-22 - 2025-05-06 |                          DIY: Branch and Bound - This exercise delves into the foundational algorithm behind generic solvers like CP-SAT. Participants will gain insights into what these solvers require for optimal performance by exploring the Branch and Bound algorithm.                          |
 |  [Exercise Sheet 3](./sheets/03_sat/)   | 2025-05-06 - 2025-05-20 |                                      SAT Solver - After the high-level interface provided by CP-SAT, this exercise demands a closer interaction with the core mechanics of a SAT solver. You will learn to translate complex problems into basic logical formulas.                                      |
 |  [Exercise Sheet 4](./sheets/04_mip/)   | 2025-05-20 - 2025-06-03 | Mixed Integer Programming - Learn about Mixed Integer Programming (MIP), a technique favored by many optimization experts. Although not as expressive as CP-SAT, MIP offers better scalability and the opportunity to apply various optimization tricks thanks to an extensive mathematical foundation. |
-| Exercise Sheet 5 (TBA)            | 2025-06-03 - 2025-06-17 |                                                                                          TBA - This exercise will be a surprise!     <!-- Probably Heuristics-->                                                                                      |
-| Exercise Sheet 6 (TBA)            | 2025-06-17 - 2025-07-01 |                                                                                          TBA - This exercise will be a surprise!     <!-- Probably Comparing the techniques on BTSP and Facility Location -->                                                                                      |
-| Exercise Sheet 7 (TBA)            | 2025-07-01 - 2025-07-15 |                                                                                          TBA - This exercise will be a surprise!     <!-- ALNS -->                                                                                      |
+|  [Exercise Sheet 5](./sheets/05_graph_coloring/)  | 2025-06-03 - 2025-06-17 | Benchmarking the Performance of Different Solvers and Formulations for the Graph Coloring Problem - This exercise focuses on comparing various formulations and solvers for the graph coloring problem, a common subproblem in many applications. It will help you understand how to benchmark solvers effectively. |                                                                                                                       |
 
 > [!WARNING]
 >
@@ -149,10 +147,10 @@ is more!
 - [Hands-On Mathematical Optimization with Python](https://www.cambridge.org/us/universitypress/subjects/mathematics/optimization-or-and-risk-analysis/hands-mathematical-optimization-python?format=PB&isbn=9781009493505):
   This book is a great introduction to mathematical optimization with Python,
   including content that is not covered in this course, such as optimization
-  under uncertainty. However, its focus is on general mathematical optimization and
-  less on combinatorial optimization, i.e., a lot of the content considers
-  continuous variables. While it may not help you directly with the exercises
-  in this course, it is a great resource if you want to get a broader view on
+  under uncertainty. However, its focus is on general mathematical optimization
+  and less on combinatorial optimization, i.e., a lot of the content considers
+  continuous variables. While it may not help you directly with the exercises in
+  this course, it is a great resource if you want to get a broader view on
   optimization.
 
 ## Found an error?

@@ -48,11 +48,11 @@ tricks to approximate them).
 
 > [!WARNING]
 >
-> Gurobi will actually allow you to do non-linear optimization, and it has become
-> considerably more powerful in the last years. However, it is significantly
-> slower than linear optimization, unless it automatically detected a way to
-> linearize the problem. In this exercise, we will not make use of this
-> functionality.
+> Gurobi will actually allow you to do non-linear optimization, and it has
+> become considerably more powerful in the last years. However, it is
+> significantly slower than linear optimization, unless it automatically
+> detected a way to linearize the problem. In this exercise, we will not make
+> use of this functionality.
 
 In a Mixed Integer Program, we have
 

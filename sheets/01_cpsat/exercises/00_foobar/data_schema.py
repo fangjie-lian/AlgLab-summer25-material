@@ -17,7 +17,7 @@ class Solution(BaseModel):
     # This is a model validator that will directly complain if the solution is inconsistent.
     @model_validator(mode="after")
     def _validate_distance(self):
-        assert self.distance == abs(self.number_a - self.number_b), (
-            "The distance is not correct."
-        )
+        assert self.distance == abs(
+            self.number_a - self.number_b
+        ), "The distance is not correct."
         return self

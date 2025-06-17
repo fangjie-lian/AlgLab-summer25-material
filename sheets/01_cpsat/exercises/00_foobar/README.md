@@ -12,7 +12,6 @@ For example, given the list `[1, 3, 5, 7, 9]`, the largest distance is `8` (from
 You can install all necessary dependencies by running
 `pip install -r requirements.txt`.
 
-
 ## Tasks
 
 ### Implement a solver in pure Python
@@ -63,8 +62,8 @@ Read the first four chapters of the CP-SAT Primer:
 - [Chapter 4: Basic Modeling](https://d-krupke.github.io/cpsat-primer/04_modelling.html)
 
 Feel also free to skip through some other chapters. The next task will be
-extremely simple once you have read the first four chapters, such that you do not
-need to rush through the chapters.
+extremely simple once you have read the first four chapters, such that you do
+not need to rush through the chapters.
 
 ### Implement a solver using CP-SAT
 
@@ -82,7 +81,6 @@ problem. You can use any function from the `ortools` library, such as:
 - `status == cp_model.OPTIMAL` to check if the model was solved optimally
 - `solver.value(...)` to get the value of a variable
 - Find more [here](https://d-krupke.github.io/cpsat-primer/04_modelling.html)
-
 
 1. Implement function `solve` in `solution_cpsat.py`. It has the same interface
    as the pure Python implementation. Be sure that you do not tell CP-SAT the

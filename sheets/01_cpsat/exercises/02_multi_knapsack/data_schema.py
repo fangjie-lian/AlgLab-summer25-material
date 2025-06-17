@@ -60,8 +60,8 @@ class Solution(BaseModel):
         already_packed_items = set()
         for truck in self.trucks:
             for item in truck:
-                assert item.id not in already_packed_items, (
-                    f"Item {item.id} is in more than one truck!"
-                )
+                assert (
+                    item.id not in already_packed_items
+                ), f"Item {item.id} is in more than one truck!"
                 already_packed_items.add(item.id)
         return self

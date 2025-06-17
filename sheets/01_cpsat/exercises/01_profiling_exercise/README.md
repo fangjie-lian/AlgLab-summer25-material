@@ -572,10 +572,10 @@ the most time-consuming and focus your optimization efforts on those areas.
 
 > [!WARNING]
 >
-> We have experienced in the past that on some systems, Scalene does not
-> work as expected. This primarily happens on Windows systems (even with WSL).
-> You can solve this exercise also without Scalene, but you should also come
-> and ask us if you encounter problems, and we may be able to help you.
+> We have experienced in the past that on some systems, Scalene does not work as
+> expected. This primarily happens on Windows systems (even with WSL). You can
+> solve this exercise also without Scalene, but you should also come and ask us
+> if you encounter problems, and we may be able to help you.
 
 ## Tasks
 
@@ -597,13 +597,15 @@ performance of the solver:
 
 > [!TIP]
 >
-> What does [Dijkstra's algorithm](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm)
+> What does
+> [Dijkstra's algorithm](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm)
 > actually compute? Could it be more than just the shortest path between two
-> nodes? If so, how can we use this to our advantage? In algorithm engineering, it is
-> essential to understand the algorithms you are using to get the most out of them.
-> Many algorithms can actually do much more than their simplified functions suggest,
-> or have parameters to stop early if certain conditions are met. There may also be
-> other algorithms that are better suited for your problem.
+> nodes? If so, how can we use this to our advantage? In algorithm engineering,
+> it is essential to understand the algorithms you are using to get the most out
+> of them. Many algorithms can actually do much more than their simplified
+> functions suggest, or have parameters to stop early if certain conditions are
+> met. There may also be other algorithms that are better suited for your
+> problem.
 
 ## References
 
