@@ -98,16 +98,67 @@ class MyRelaxationSolver(RelaxationSolver):
 
     Implement any relaxation (e.g., fractional knapsack, propagation) to tighten bounds.
     """
-
-    def solve(
+    def solve_fractional_knapsack(
         self, instance: Instance, decisions: BranchingDecisions
     ) -> RelaxedSolution:
-        # placeholder: behave like NaiveRelaxationSolver
-        used = sum(item.weight for item, x in zip(instance.items, decisions) if x == 1)
-        if used > instance.capacity:
-            return RelaxedSolution.create_infeasible(instance)
-        selection = [0.0 if x == 0 else 1.0 for x in decisions]
+        """
+        Solve the fractional knapsack problem from the given instance and deduced
+          fixations.
+        instance: knapsack problem instance
+        fixation: list of predefined item selections, where 0 means not taken,
+            1 means fully taken, and None means not fixed
+        """
+        remaining_capacity = instance.capacity - sum(
+            item.weight for item, x in zip(instance.items, decisions) if x == 1
+        )
+        # Compute solution
+        selection = [1.0 if x == 1 else 0.0 for x in decisions]
+        remaining_indices = [i for i, x in enumerate(decisions) if x is None]
+        remaining_indices.sort(
+            key=lambda i: instance.items[i].value / instance.items[i].weight,
+            reverse=True,
+        )
+        for i in remaining_indices:
+            # Fill solution with items sorted by value/weight
+            if instance.items[i].weight <= remaining_capacity:
+                selection[i] = 1.0
+                remaining_capacity -= instance.items[i].weight
+            else:
+                selection[i] = remaining_capacity / instance.items[i].weight
+                break  # no capacity left
+        assert all(
+            x0 == x1 for x0, x1 in zip(decisions, selection) if x0 is not None
+        ), "Fixed part is not allowed to change."
         upper = sum(item.value * sel for item, sel in zip(instance.items, selection))
         return RelaxedSolution(instance, selection, upper)
 
 
+    def solve(
+        self, instance: Instance, decisions: BranchingDecisions
+    ) -> RelaxedSolution:
+        fractional_solution = self.solve_fractional_knapsack(instance, decisions)
+
+        if fractional_solution.is_integral():
+            return fractional_solution
+        
+        frac_index = 0
+        choosen_indices = []
+        for i, x in enumerate(fractional_solution.selection):
+            if x == 1 and decisions[i] is None:
+                choosen_indices.append(i)
+            if x > 0 and x < 1:
+                choosen_indices.append(i)
+                frac_index = i
+                break
+        
+        max_new_frac_solution_value = float('-inf')
+        max_new_frac_solution = None
+        for j in choosen_indices:
+            new_fixation = decisions.copy()
+            new_fixation.fix(j, 0)
+            new_frac_solution = self.solve_fractional_knapsack(instance, new_fixation)
+            if max_new_frac_solution_value < new_frac_solution.value():
+                max_new_frac_solution = new_frac_solution
+                max_new_frac_solution_value = new_frac_solution.value()
+        
+        return max_new_frac_solution

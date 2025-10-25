@@ -1,10 +1,8 @@
-import bisect
 import logging
 import math
 from typing import Iterable
 
 import networkx as nx
-from pysat.solvers import Solver as SATSolver
 
 logging.basicConfig(level=logging.INFO)
 

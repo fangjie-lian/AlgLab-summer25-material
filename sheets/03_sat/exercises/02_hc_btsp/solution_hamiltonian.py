@@ -1,4 +1,3 @@
-import itertools
 import logging
 
 import networkx as nx
@@ -22,7 +21,6 @@ class HamiltonianCycleModel:
         # TODO: Implement me!
         # Log model initialization completion
         logging.info("HamiltonianCycleModel initialized successfully!")
-
 
     def solve(self) -> list[tuple[int, int]] | None:
         """

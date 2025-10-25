@@ -88,10 +88,14 @@ class SearchStrategy:
 # This stub returns a constant key.
 
 
+# The node with the smallest priority value is selected first.
+# If two nodes have the same priority value, the one that was created first is selected first.
+# Maybe there is a better way than to do a first in first out?
 def my_search_order(node: BnBNode) -> Any:
-    """
-    Example default: constant priority.
-    """
-    return 0
-
-
+    # The returned value must be comparable.
+    # It can be a number, a tuple, or any other comparable object.
+    # If my_search_order(a)<my_search_order(b), then a is selected first.
+    if node.relaxed_solution.value() == 0:
+        return (float("inf"), node.node_id)
+    else:
+        return (1 / node.relaxed_solution.value(), node.node_id)

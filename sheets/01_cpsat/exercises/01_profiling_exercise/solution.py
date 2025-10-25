@@ -16,15 +16,13 @@ logging.basicConfig(
     ],
 )
 
-
+"""
 def get_edge_weight(weighted_graph: ProblemInstance, u: str, v: str) -> int:
-    """Retrieve the weight of the edge between two nodes."""
-    for edge in weighted_graph.connections:
-        if (edge.endpoint_a == u and edge.endpoint_b == v) or (
-            edge.endpoint_a == v and edge.endpoint_b == u
-        ):
+    for edge in weighted_graph.connections:  # direkte Verbindung
+        if edge.endpoint_a == u and edge.endpoint_b == v:
             return edge.distance
     raise KeyError(f"Edge {u} - {v} not found in the graph")
+"""
 
 
 def build_weighted_graph(instance: ProblemInstance) -> nx.Graph:
@@ -37,32 +35,15 @@ def build_weighted_graph(instance: ProblemInstance) -> nx.Graph:
     G = nx.Graph()
 
     # Add all endpoints as nodes in the graph
+
     for vertex in instance.endpoints:
         G.add_node(vertex)
 
     # Add edges with weights to the graph
-    for v in instance.endpoints:
-        for w in instance.endpoints:
-            if v != w:  # Ensure not to check the same node
-                # Check if there is an edge between v and w
-                if any(
-                    edge.endpoint_a == v and edge.endpoint_b == w
-                    for edge in instance.connections
-                ) or any(
-                    edge.endpoint_a == w and edge.endpoint_b == v
-                    for edge in instance.connections
-                ):
-                    # Get the weight of the edge and add it to the graph
-                    weight = get_edge_weight(instance, v, w)
-                    G.add_edge(v, w, weight=weight)
+    for edge in instance.connections:
+        G.add_edge(edge.endpoint_a, edge.endpoint_b, weight=edge.distance)
 
     return G
-
-
-def distance(instance: ProblemInstance, u: str, v: str) -> int:
-    """Calculate the shortest path distance between two endpoints in the network."""
-    graph = build_weighted_graph(instance)
-    return nx.shortest_path_length(graph, u, v, weight="weight")
 
 
 class MaxPlacementsSolver:
@@ -82,22 +63,51 @@ class MaxPlacementsSolver:
             for endpoint in instance.approved_endpoints
         }
 
+        self.graph = build_weighted_graph(instance)
+        self.distance_map = {}
+
         # Add constraints and objective to the model
         self._add_distance_constraints()
         self._set_objective()
         logging.info("Finished building the model")
 
+    # position: außerhalb der Klasse -> in der Klasse
+    def distance(self, u: str, v: str) -> int:
+        """Calculate the shortest path distance between two endpoints in the network."""
+        # gelöscht: jedesmal den Graph abzubauen
+        if (u, v) in self.distance_map:
+            return self.distance_map[(u, v)]
+        self.distance_map[(u, v)] = nx.shortest_path_length(
+            self.graph, u, v, weight="weight"
+        )
+        self.distance_map[(v, u)] = self.distance_map[(u, v)]
+        return self.distance_map[(u, v)]
+
     def _add_distance_constraints(self):
         """Add constraints to ensure selected endpoints are not too close."""
         logging.info("Adding distance constraints")
+        min_distance = self.instance.min_distance_between_placements
+        for endpoint1 in self.instance.approved_endpoints:
+            lengths = nx.single_source_dijkstra_path_length(
+                self.graph, endpoint1, cutoff=min_distance - 1
+            )  # bfs + cutoff
+            for endpoint2 in lengths.keys():
+                if endpoint2 not in self.instance.approved_endpoints:
+                    continue
+                if endpoint1 < endpoint2:
+                    self.model.Add(
+                        self.vars[endpoint1] + self.vars[endpoint2] <= 1
+                    )  # nicht gleichzeitig in Lsgsmenge
+
+        """
         for endpoint1, endpoint2 in itertools.combinations(
             self.instance.approved_endpoints, 2
         ):
-            if (
-                distance(self.instance, endpoint1, endpoint2)
-                < self.instance.min_distance_between_placements
-            ):
-                self.model.Add(self.vars[endpoint1] + self.vars[endpoint2] <= 1)
+            if self.distance(endpoint1, endpoint2) < min_distance:
+                self.model.Add(
+                    self.vars[endpoint1] + self.vars[endpoint2] <= 1
+                )  # nicht gleichzeitig in Lsgsmenge
+        """
 
     def _set_objective(self):
         """Set the objective to maximize the number of selected endpoints."""

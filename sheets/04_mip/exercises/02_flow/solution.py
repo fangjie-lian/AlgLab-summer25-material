@@ -1,10 +1,7 @@
 import logging
 
 import gurobipy as gp
-import networkx as nx
 from data_schema import Instance, Solution
-from gurobipy import GRB
-
 
 
 def _check_linear(model: gp.Model):
@@ -36,7 +33,6 @@ class MiningRoutingSolver:
             instance.budget,
         )
         # TODO: Implement me!
-
 
     def solve(self) -> Solution:
         """

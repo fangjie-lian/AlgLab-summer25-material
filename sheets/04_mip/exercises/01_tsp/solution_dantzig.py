@@ -53,7 +53,6 @@ class GurobiTspSolver:
         self._model = gp.Model()
         # TODO: Implement me!
 
-
     def get_lower_bound(self) -> float:
         """
         Return the current lower bound.
@@ -89,4 +88,3 @@ class GurobiTspSolver:
 
         # ...
         # TODO: Implement me!
-

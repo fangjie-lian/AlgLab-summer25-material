@@ -9,8 +9,6 @@ import gurobipy as gp
 import networkx as nx
 
 
-
-
 class GurobiTspRelaxationSolver:
     """
     IMPLEMENT ME!
@@ -38,7 +36,6 @@ class GurobiTspRelaxationSolver:
         logging.info("Implementing subtour elimination with >= %d", k)
         self._model = gp.Model()
         # TODO: Implement me!
-
 
     def get_lower_bound(self) -> float:
         """

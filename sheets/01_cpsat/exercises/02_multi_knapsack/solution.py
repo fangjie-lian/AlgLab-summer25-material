@@ -1,8 +1,7 @@
 import math
-from typing import List
 
-from data_schema import Instance, Item, Solution
-from ortools.sat.python.cp_model import FEASIBLE, OPTIMAL, CpModel, CpSolver
+from data_schema import Instance, Solution
+from ortools.sat.python.cp_model import OPTIMAL, CpModel, CpSolver
 
 
 class MultiKnapsackSolver:
@@ -32,8 +31,30 @@ class MultiKnapsackSolver:
         self.solver = CpSolver()
         self.solver.parameters.log_search_progress = True
         # TODO: Implement me!
+        # j - knapsack-index, i - item-index
+        self.x = [
+            [self.model.new_bool_var(f"x_{j}_{i}") for i in range(len(self.items))]
+            for j in range(len(self.capacities))
+        ]
+        # die Kapazität jedes Knapsacks darf nicht überschritten werden
+        for j in range(len(self.capacities)):
+            total_weight = sum(
+                self.x[j][i] * self.items[i].weight for i in range(len(self.items))
+            )
+            self.model.add(total_weight <= self.capacities[j])
+        # jedes Item wird nur max. 1 mal verwendet
+        for i in range(len(self.items)):
+            self.model.add(sum(self.x[j][i] for j in range(len(self.capacities))) <= 1)
+        # Zielfkt.
+        total_value = []
+        for j in range(len(self.capacities)):
+            for i in range(len(self.items)):
+                # x[j][i] * value[i]
+                total_value.append(
+                    self.x[j][i] * self.items[i].value
+                )  # self.items[i].value
 
-
+        self.model.maximize(sum(total_value))
 
     def solve(self, timelimit: float = math.inf) -> Solution:
         """
@@ -51,4 +72,16 @@ class MultiKnapsackSolver:
         if timelimit < math.inf:
             self.solver.parameters.max_time_in_seconds = timelimit
         # TODO: Implement me!
-        return Solution(trucks=[])  # empty solution
+        # Solve the model
+        status = self.solver.Solve(self.model)
+        # Check and return the solution
+        assert status == OPTIMAL
+        trucks_solution = []
+        for j in range(len(self.capacities)):
+            packed_items = []
+            for i in range(len(self.items)):
+                if self.solver.Value(self.x[j][i]) == 1:
+                    packed_items.append(self.items[i])
+            trucks_solution.append(packed_items)
+
+        return Solution(trucks=trucks_solution)
