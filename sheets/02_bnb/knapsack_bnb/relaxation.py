@@ -134,6 +134,64 @@ class FractionalKnapsack(RelaxationSolver):
         return RelaxedSolution(instance, selection, upper)
 
 
+class FractionalKnapsackPlusPropagation(RelaxationSolver):
+    """
+    Your relaxation solver stub.
+
+    Implement any relaxation (e.g., fractional knapsack, propagation) to tighten bounds.
+    """
+
+    def solve(
+        self, instance: Instance, decisions: BranchingDecisions
+    ) -> RelaxedSolution:
+        """
+        Solve the fractional knapsack problem from the given instance and deduced
+          fixations.
+        instance: knapsack problem instance
+        fixation: list of predefined item selections, where 0 means not taken,
+            1 means fully taken, and None means not fixed
+        """
+        remaining_capacity = instance.capacity - sum(
+            item.weight for item, x in zip(instance.items, decisions) if x == 1
+        )
+        # Compute solution
+        selection = [1.0 if x == 1 else 0.0 for x in decisions]
+        remaining_indices = [i for i, x in enumerate(decisions) if x is None]
+
+        if (
+            sum(instance.items[i].weight for i in remaining_indices)
+            <= remaining_capacity
+        ):
+            # Propagation: Falls alle nicht fixierten Items gleichzeitig in den Rucksack passen, setze bi = 1 für all diese Items.
+            for i in remaining_indices:
+                selection[i] = 1.0
+        else:
+            remaining_indices.sort(
+                key=lambda i: instance.items[i].value / instance.items[i].weight,
+                reverse=True,
+            )
+            for i in remaining_indices:
+                # Propagation: Falls ein Item unter der aktuellen Teilbelegung nicht mehr genommen werden kann,
+                # weil es nicht mehr in die verbleibende Kapazität passt, setze die dazugehörige Variable auf 0
+                if instance.items[i].weight > remaining_capacity:
+                    selection[i] = 0
+                    remaining_indices.remove(i)
+
+            for i in remaining_indices:
+                # Fill solution with items sorted by value/weight
+                if instance.items[i].weight <= remaining_capacity:
+                    selection[i] = 1.0
+                    remaining_capacity -= instance.items[i].weight
+                else:
+                    selection[i] = remaining_capacity / instance.items[i].weight
+                    break  # no capacity left
+        assert all(
+            x0 == x1 for x0, x1 in zip(decisions, selection) if x0 is not None
+        ), "Fixed part is not allowed to change."
+        upper = sum(item.value * sel for item, sel in zip(instance.items, selection))
+        return RelaxedSolution(instance, selection, upper)
+
+
 class MyRelaxationSolver(RelaxationSolver):
     """
     Your relaxation solver stub.
@@ -144,7 +202,9 @@ class MyRelaxationSolver(RelaxationSolver):
     def solve(
         self, instance: Instance, decisions: BranchingDecisions
     ) -> RelaxedSolution:
-        fractional_solution = FractionalKnapsack.solve(self, instance, decisions)
+        fractional_solution = FractionalKnapsackPlusPropagation.solve(
+            self, instance, decisions
+        )
 
         if fractional_solution.is_integral():
             return fractional_solution
@@ -164,7 +224,9 @@ class MyRelaxationSolver(RelaxationSolver):
         for j in choosen_indices:
             new_fixation = decisions.copy()
             new_fixation.fix(j, 0)
-            new_frac_solution = FractionalKnapsack.solve(self, instance, new_fixation)
+            new_frac_solution = FractionalKnapsackPlusPropagation.solve(
+                self, instance, new_fixation
+            )
             if max_new_frac_solution_value < new_frac_solution.value():
                 max_new_frac_solution = new_frac_solution
                 max_new_frac_solution_value = new_frac_solution.value()

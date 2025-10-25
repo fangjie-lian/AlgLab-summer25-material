@@ -9,6 +9,7 @@ from knapsack_bnb.instance import Instance, Item
 from knapsack_bnb.relaxation import (
     MyRelaxationSolver,
     FractionalKnapsack,
+    FractionalKnapsackPlusPropagation,
     VeryNaiveRelaxationSolver,
     NaiveRelaxationSolver,
 )
@@ -47,7 +48,7 @@ def run_first_instance():
     # You can easily exchange the various components of the BnBSearch here:
     bnb = BnBSearch(
         instance,
-        relaxation=MyBranchingStrategy(),
+        relaxation=MyRelaxationSolver(),
         search_strategy=SearchStrategy(priority=my_search_order),
         branching_strategy=MyBranchingStrategy(),
         heuristics=MyHeuristic(),
