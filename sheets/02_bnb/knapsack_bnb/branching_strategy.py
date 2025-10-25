@@ -58,7 +58,9 @@ class MyBranchingStrategy(BranchingStrategy):
     The simplest strategy is to pick an unfixed variable and split on 0/1.
     """
 
-    def make_branching_decisions(self, fractional_node: BnBNode) -> Tuple[BranchingDecisions, ...]:
+    def make_branching_decisions(
+        self, fractional_node: BnBNode
+    ) -> Tuple[BranchingDecisions, ...]:
         """
         You are given a node with a fractional solution. Decide how you want to split the
         solution space. The easiest way to do so is to select a variable that hasn't been fixed
@@ -76,3 +78,32 @@ class MyBranchingStrategy(BranchingStrategy):
                 idx = i
                 break
         return fractional_node.branching_decisions.split_on(idx)
+
+
+class NoBranchingStrategy(BranchingStrategy):
+    """
+    Your implementation of a branching strategy.
+
+    Decide which variable(s) to branch on at each node using information
+    from the node's relaxed solution (e.g., fractional values, scores, etc.).
+    The simplest strategy is to pick an unfixed variable and split on 0/1.
+    """
+
+    def make_branching_decisions(
+        self, fractional_node: BnBNode
+    ) -> Tuple[BranchingDecisions, ...]:
+        """
+        You are given a node with a fractional solution. Decide how you want to split the
+        solution space. The easiest way to do so is to select a variable that hasn't been fixed
+        yet and split the solution space into two by fixing it to 0 and 1, respectively.
+        """
+        # Node is integral => optimale Lsg für den Node ist gefunden
+        assert not fractional_node.relaxed_solution.is_integral(), "Node is fractional"
+        assert (
+            fractional_node.relaxed_solution.does_obey_capacity_constraint()
+        ), "Node is feasible"
+        # find the index of the first non-fixed variable
+        first_unfixed_idx = min(
+            i for i, x in enumerate(fractional_node.branching_decisions) if x is None
+        )
+        return fractional_node.branching_decisions.split_on(first_unfixed_idx)

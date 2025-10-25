@@ -10,7 +10,7 @@ by supplying different priority functions.
 """
 
 import queue
-from typing import Callable, Iterator, Tuple, Any
+from typing import Callable, Iterator, Tuple, Any, override
 
 from .bnb_nodes import BnBNode
 
@@ -95,7 +95,12 @@ def my_search_order(node: BnBNode) -> Any:
     # The returned value must be comparable.
     # It can be a number, a tuple, or any other comparable object.
     # If my_search_order(a)<my_search_order(b), then a is selected first.
+
+    # Ansatz: node, deren value/weight max. ist
     if node.relaxed_solution.value() == 0:
         return (float("inf"), node.node_id)
     else:
         return (1 / node.relaxed_solution.value(), node.node_id)
+
+def no_search_order(node: BnBNode) -> Any:
+        return 1

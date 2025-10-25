@@ -92,13 +92,14 @@ class NaiveRelaxationSolver(RelaxationSolver):
         return RelaxedSolution(instance, selection, upper)
 
 
-class MyRelaxationSolver(RelaxationSolver):
+class FractionalKnapsack(RelaxationSolver):
     """
     Your relaxation solver stub.
 
     Implement any relaxation (e.g., fractional knapsack, propagation) to tighten bounds.
     """
-    def solve_fractional_knapsack(
+
+    def solve(
         self, instance: Instance, decisions: BranchingDecisions
     ) -> RelaxedSolution:
         """
@@ -133,32 +134,39 @@ class MyRelaxationSolver(RelaxationSolver):
         return RelaxedSolution(instance, selection, upper)
 
 
+class MyRelaxationSolver(RelaxationSolver):
+    """
+    Your relaxation solver stub.
+
+    Implement any relaxation (e.g., fractional knapsack, propagation) to tighten bounds.
+    """
+
     def solve(
         self, instance: Instance, decisions: BranchingDecisions
     ) -> RelaxedSolution:
-        fractional_solution = self.solve_fractional_knapsack(instance, decisions)
+        fractional_solution = FractionalKnapsack.solve(self, instance, decisions)
 
         if fractional_solution.is_integral():
             return fractional_solution
-        
-        frac_index = 0
+
         choosen_indices = []
         for i, x in enumerate(fractional_solution.selection):
             if x == 1 and decisions[i] is None:
                 choosen_indices.append(i)
             if x > 0 and x < 1:
                 choosen_indices.append(i)
-                frac_index = i
-                break
-        
-        max_new_frac_solution_value = float('-inf')
+
+        if not choosen_indices:
+            return fractional_solution
+
+        max_new_frac_solution_value = float("-inf")
         max_new_frac_solution = None
         for j in choosen_indices:
             new_fixation = decisions.copy()
             new_fixation.fix(j, 0)
-            new_frac_solution = self.solve_fractional_knapsack(instance, new_fixation)
+            new_frac_solution = FractionalKnapsack.solve(self, instance, new_fixation)
             if max_new_frac_solution_value < new_frac_solution.value():
                 max_new_frac_solution = new_frac_solution
                 max_new_frac_solution_value = new_frac_solution.value()
-        
+
         return max_new_frac_solution

@@ -49,13 +49,37 @@ class MyHeuristic(Heuristics):
             and node.relaxed_solution.is_integral()
         ):
             # WARNING: Do not not modify the solution in place! Create a copy!
-            solutions.append(node.relaxed_solution.copy()) # https://www.w3schools.com/python/ref_keyword_yield.asp
-        elif ( # Änderung
-            node.relaxed_solution.does_obey_capacity_constraint()
-        ):
+            solutions.append(
+                node.relaxed_solution.copy()
+            )  # https://www.w3schools.com/python/ref_keyword_yield.asp
+        elif node.relaxed_solution.does_obey_capacity_constraint():  # Änderung
             integral_solution = node.relaxed_solution.copy()
-            for i, x in enumerate(integral_solution.selection): # falsch: for i in integral_solution.selection
+            for i, x in enumerate(
+                integral_solution.selection
+            ):  # falsch: for i in integral_solution.selection
                 if x > 0 and x < 1:
-                    integral_solution.selection[i] = 0 # falsch: x = 0
+                    integral_solution.selection[i] = 0  # falsch: x = 0
+                    break  # nur eine einzige x könnte fractional sein
             solutions.append(integral_solution)
+        return tuple(solutions)
+
+
+class MyHeuristic_integral(Heuristics):
+    """
+    Your heuristic implementation.
+
+    The simplest heuristic returns the node's relaxed solution
+    if it is already feasible (integral and within capacity).
+    """
+
+    def search(self, instance: Instance, node: BnBNode) -> Tuple[RelaxedSolution, ...]:
+        # Maybe we can also obtain a feasible solution from fractional solutions?
+        # It doesn't have to be perfect...
+        solutions = []
+        if (
+            node.relaxed_solution.does_obey_capacity_constraint()
+            and node.relaxed_solution.is_integral()
+        ):
+            # WARNING: Do not not modify the solution in place! Create a copy!
+            solutions.append(node.relaxed_solution.copy())
         return tuple(solutions)
