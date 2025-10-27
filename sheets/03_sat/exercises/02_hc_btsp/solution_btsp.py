@@ -1,10 +1,13 @@
 import math
 import logging
 from enum import Enum
+import bisect
 
 import networkx as nx
 from _timer import Timer
 from solution_hamiltonian import HamiltonianCycleModel
+from pysat.solvers import Solver as SATSolver
+
 
 # Configure logging to show INFO messages
 logging.basicConfig(level=logging.INFO)
@@ -46,12 +49,26 @@ class BottleneckTSPSolver:
         )
         self.graph = graph
         # TODO: Implement me!
+        edges_with_weight = (
+            e for e in graph.edges(data="weight") if e[2] is not None
+        )  # (edge, weight) = (u, v, weight)
+        self.sorted_edge = sorted(edges_with_weight, key=lambda e: e[2])
+        self._solution: list[tuple[int, int]] | None = None
+        self._tmp_solution: list[tuple[int, int]] | None = None
         # Log initialization completion
         logging.info("BottleneckTSPSolver initialized successfully!")
 
-
     def lower_bound(self) -> float:
         # TODO: Implement me!
+        if len(self._tmp_solution) == 0:
+            return float("inf")
+        max = 0
+        for e in self._tmp_solution:
+            u, v = e
+            w = self.graph[u][v].get("weight")
+            if w > max:
+                max = w
+        return max
 
     def optimize_bottleneck(
         self,
@@ -66,3 +83,34 @@ class BottleneckTSPSolver:
         logging.info("Timer initialized with limit %f seconds", time_limit)
 
         # TODO: Implement me!
+        weights = [w for (_u, _v, w) in self.sorted_edge]
+        # if (search_strategy == SearchStrategy.BINARY_SEARCH):
+        a = 0
+        b = len(self.sorted_edge) - 1
+        while a <= b:
+            i = a + (b - a) // 2
+            edges_false = [(u, v, w) for (u, v, w) in self.sorted_edge[i + 1 :]]
+            self._tmp_solution = HamiltonianCycleModel(self.graph).solve(edges_false)
+            if self._tmp_solution is None:
+                a = i + 1
+                continue
+            self._solution = self._tmp_solution
+            max_dist = self.lower_bound()
+            print("max_dist=", max_dist)
+            b = bisect.bisect_left(weights, max_dist) - 1
+        # if (search_strategy == SearchStrategy.SEQUENTIAL_UP):
+        #     index = len(weights)
+        #     while True:
+        #         for i in range(len(weights)):
+        #             if i != 0:
+        #                 edges_false = [(u, v, w) for (u, v, w) in self.sorted_edge[index + 1 :]]
+        #                 self._tmp_solution = self.model.solve(edges_false)
+        #             else:
+        #                 self._tmp_solution = self.model.solve()
+        #             if self._tmp_solution is None:
+        #                 continue
+        #             self._solution = self._tmp_solution
+        #             index = bisect.bisect_left(weights, self.lower_bound()) - 1
+        #             weights = weights[:index+1]
+
+        return self._solution
