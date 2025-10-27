@@ -146,6 +146,7 @@ class KCenterDecisionVariant:
         while i >= 0:
             self.solver = SATSolver("Minicard")
             self.solver.add_atmost(vars, self.k)
+            # ohne neuen Solver aufzubauen 16.4s (mit 9.2s)
             limit = distances_values[i]
             self.limit_distance(limit)
             if self.solver.solve():
@@ -161,7 +162,7 @@ class KCenterDecisionVariant:
             else:
                 break
 
-        """ # binary search - irgendwie to slow 
+        """ # binary search - jede Iteration irgendwie zu langsam (9-10s)(warum)
         while a <= b:
             i = a + (b - a) // 2
             limit = distances_values[i]

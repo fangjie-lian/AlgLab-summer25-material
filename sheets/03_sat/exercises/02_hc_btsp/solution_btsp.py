@@ -49,10 +49,10 @@ class BottleneckTSPSolver:
         )
         self.graph = graph
         # TODO: Implement me!
-        edges_with_weight = (
+        edges_with_weight = [
             e for e in graph.edges(data="weight") if e[2] is not None
-        )  # (edge, weight) = (u, v, weight)
-        self.sorted_edge = sorted(edges_with_weight, key=lambda e: e[2])
+        ]  # (edge, weight) = (u, v, weight)
+        self.sorted_edge = sorted(edges_with_weight, key=lambda e: e[2]) # e[2] is weight of the edge e
         self._solution: list[tuple[int, int]] | None = None
         self._tmp_solution: list[tuple[int, int]] | None = None
         # Log initialization completion
@@ -96,8 +96,8 @@ class BottleneckTSPSolver:
                 continue
             self._solution = self._tmp_solution
             max_dist = self.lower_bound()
-            print("max_dist=", max_dist)
             b = bisect.bisect_left(weights, max_dist) - 1
+
         # if (search_strategy == SearchStrategy.SEQUENTIAL_UP):
         #     index = len(weights)
         #     while True:

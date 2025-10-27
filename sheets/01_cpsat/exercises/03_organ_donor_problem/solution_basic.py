@@ -31,11 +31,15 @@ class CrossoverTransplantSolver:
             compatible_donors = self.database.get_compatible_donors(recipient_to)
             if compatible_donors == None:
                 continue
-            for compatible_donor in compatible_donors:
+            for (
+                compatible_donor
+            ) in compatible_donors:  # Constraint 0: keine uncompatible Donation
                 recipient_from = self.database.get_partner_recipient(compatible_donor)
                 if recipient_from == None:
                     continue
-                if recipient_to.id != recipient_from.id:  # Constraint 4 & 0
+                if (
+                    recipient_to.id != recipient_from.id
+                ):  # Constraint 4: ∃(di, rj) als pair: x[i][j] = 0
                     self.graph.add_edge(
                         recipient_from.id,
                         recipient_to.id,
@@ -56,7 +60,7 @@ class CrossoverTransplantSolver:
                 for (recipient_from, recipient_to) in self.graph.edges
                 if self.graph[recipient_from][recipient_to]["link_donor"].id == donor.id
             ]
-            if edges_with_donor:  # nicht leer
+            if edges_with_donor:  # nicht leer -> Constraints hinzuzufügen
                 self.model.add(sum(self.x[edge] for edge in edges_with_donor) <= 1)
 
         for recipient in self.recipients:

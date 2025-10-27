@@ -74,7 +74,12 @@ class FeedbackVertexSetDecisionVariant:
         add clauses to select at least one node per cycle. A cycle basis, calculable
         in polynomial time, is a set of combinable cycles to construct any graph cycle.
         This method returns the found cycle basis size.
-        """
+        # cycle - clause, vertex of cycle - var
+        Frage:
+        1. was ist cycle basis - wie Basis eines Vektorraums, alle Cycles im Graph können durch die cycle Basis bilden
+           z. B. A, B ∈ cycle basis, A ∩ B ≠ ∅, C ∉ cycle basis aber C = A xor B (alle Kanten entweder in A oder B aber nicht in A und B)
+        2. wie kann man cycle basis finden - nx.cycle_basis(G)
+        """ 
         cycle_list = nx.cycle_basis(subgraph)
         for cycle in cycle_list:
             # at least one node per cycle must be selected (positive variable assignment)
@@ -84,14 +89,14 @@ class FeedbackVertexSetDecisionVariant:
 
     def limit_k(self, k: int):
         """
-        Update the model in order to enforce a new limit of k selected nodes.
+        Update the model in order to enforce (zwingen) a new limit of k selected nodes.
         """
         if k > self.k:
             # Increasing k is not possible without resetting the solver.
             msg = "The new value for k must be smaller than the old value."
             raise ValueError(msg)
 
-        self.solver.add_atmost([self.node_vars.x(v) for v in self.graph.nodes], k)
+        self.solver.add_atmost([self.node_vars.x(v) for v in self.graph.nodes], k) # solver von networkx 
         self.k = k
 
     def solve(self, time_limit: float = 900) -> set[Node] | None:
@@ -108,7 +113,8 @@ class FeedbackVertexSetDecisionVariant:
         while self.solver.solve():
             timer.check()  # throws TimeoutError if time is up
             # Retrieve the solution from the solver.
-            model = self.solver.get_model()
+            model = self.solver.get_model() # model bedeutet hier solution
+            # die solution erfüllt nicht alle Constraints wegen Lazy-Contraints-Strategie
             assert (
                 model is not None
             ), "We expect a solution. Otherwise, we would have had a timeout."
@@ -118,7 +124,7 @@ class FeedbackVertexSetDecisionVariant:
             subgraph.remove_nodes_from(feedback_nodes)
             # Add constraint to forbid found cycle and solve again.
             # This approach is efficient as the solver continues from its stop point.
-            # Fewer constraints lead to simpler, faster solved models despite potential exponential constraints.
+            # Fewer constraints lead to simpler, faster solved models despite (trotz) potential exponential constraints.
             num_cycles = self._find_and_handle_cycle_basis(subgraph)
             if num_cycles == 0:
                 # The remaining graph contains no cycles. A valid solution was found!

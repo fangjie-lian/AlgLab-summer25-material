@@ -3,7 +3,7 @@ import math
 
 from data_schema import Solution, Donation
 from database import TransplantDatabase
-from ortools.sat.python.cp_model import FEASIBLE, OPTIMAL, CpModel, CpSolver
+from ortools.sat.python.cp_model import OPTIMAL, CpModel, CpSolver
 
 
 class CrossoverTransplantSolver:
@@ -27,7 +27,7 @@ class CrossoverTransplantSolver:
             for recipient in self.recipients:
                 self.x[(donor.id, recipient.id)] = self.model.new_bool_var(
                     f"x_{donor.id}_{recipient.id}"
-                ) # self.x[(donor.id, recipient.id)] == 1 bedeutet, recipient_id akzeptiert donor_id
+                )  # self.x[(donor.id, recipient.id)] == 1 bedeutet, recipient_id akzeptiert donor_id
 
         for donor in self.donors:
             compatible_recipients = self.database.get_compatible_recipients(donor)
@@ -41,8 +41,9 @@ class CrossoverTransplantSolver:
                 sum(self.x[(donor.id, recipient.id)] for recipient in self.recipients)
                 <= 1
             )
+
             partner_recipient = self.database.get_partner_recipient(donor)
-            # Constraint 4: ∃(di, rj): x[i][j] = 0
+            # Constraint 4: ∃(di, rj) als pair: x[i][j] = 0
             self.model.add(self.x[(donor.id, partner_recipient.id)] == 0)
 
             # Constraint 3: A donor is willing to donate only if their associated recipient receives an organ in exchange.
@@ -57,7 +58,9 @@ class CrossoverTransplantSolver:
             if_donate = sum(
                 self.x[(donor.id, recipient.id)] for recipient in compatible_recipients
             )
-            self.model.add(if_donate <= if_receive)  # nicht =
+            self.model.add(
+                if_donate <= if_receive
+            )  # nicht = (andere Donors können donate)
 
         for recipient in self.recipients:
             compatible_donors = self.database.get_compatible_donors(recipient)
