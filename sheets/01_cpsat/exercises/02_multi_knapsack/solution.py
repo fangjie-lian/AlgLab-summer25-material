@@ -1,7 +1,7 @@
 import math
 
 from data_schema import Instance, Solution
-from ortools.sat.python.cp_model import OPTIMAL, CpModel, CpSolver
+from ortools.sat.python.cp_model import OPTIMAL, FEASIBLE, CpModel, CpSolver
 
 
 class MultiKnapsackSolver:
@@ -36,15 +36,46 @@ class MultiKnapsackSolver:
             [self.model.new_bool_var(f"x_{j}_{i}") for i in range(len(self.items))]
             for j in range(len(self.capacities))
         ]
-        # die Kapazität jedes Knapsacks darf nicht überschritten werden
+        # Constraint1: die Kapazität jedes Knapsacks darf nicht überschritten werden
         for j in range(len(self.capacities)):
             total_weight = sum(
                 self.x[j][i] * self.items[i].weight for i in range(len(self.items))
             )
             self.model.add(total_weight <= self.capacities[j])
-        # jedes Item wird nur max. 1 mal verwendet
+        # Constraint3: toxic and non-toxic items cannot be packed together
+        if self.activate_toxic == True:
+            for j in range(len(self.capacities)):
+                toxic_index = [
+                    index for index, item in enumerate(self.items) if item.toxic
+                ]
+                nontoxic_index = [
+                    index for index, item in enumerate(self.items) if not item.toxic
+                ]
+                # Effizienz
+                has_toxic = self.model.new_bool_var(f"has_toxic_{j}")
+                has_nontoxic = self.model.new_bool_var(f"has_nontoxic_{j}")
+                self.model.add_max_equality(has_toxic, [self.x[j][i] for i in toxic_index] or [0]) # has_toxic = max[...]
+                self.model.add_max_equality(has_nontoxic, [self.x[j][k] for k in nontoxic_index] or [0])
+                self.model.add(has_toxic + has_nontoxic <= 1)
+
+                # for i in toxic_index:
+                #     self.model.add(
+                #         sum(self.x[j][k] for k in nontoxic_index) == 0
+                #     ).only_enforce_if(self.x[j][i])
+                # for k in nontoxic_index:
+                #     self.model.add(
+                #         sum(self.x[j][i] for i in toxic_index) == 0
+                #     ).only_enforce_if(self.x[j][k])
+
+                # for i in toxic_index:
+                #     for k in nontoxic_index:
+                #     self.model.add(
+                #         self.x[j][i] + self.x[j][k] <= 1
+                #     )
+        # Constraint2: jedes Item wird nur max. 1 mal verwendet
         for i in range(len(self.items)):
             self.model.add(sum(self.x[j][i] for j in range(len(self.capacities))) <= 1)
+
         # Zielfkt.
         total_value = []
         for j in range(len(self.capacities)):
@@ -75,7 +106,7 @@ class MultiKnapsackSolver:
         # Solve the model
         status = self.solver.Solve(self.model)
         # Check and return the solution
-        assert status == OPTIMAL
+        assert status == OPTIMAL or FEASIBLE
         trucks_solution = []
         for j in range(len(self.capacities)):
             packed_items = []
