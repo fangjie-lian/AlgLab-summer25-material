@@ -16,8 +16,8 @@ You do not modify this file; instead, you will implement and supply custom strat
 for relaxation, branching, search ordering, and heuristics to observe performance differences.
 """
 
-from typing import Optional
 import logging
+from typing import Optional
 
 from .bnb_nodes import BnBNode, NodeFactory, NodeStatus
 from .branching_strategy import BranchingStrategy
@@ -67,8 +67,9 @@ class BnBSearch:
 
         # Factory to create tree nodes, with callback on new node
         self.node_factory = NodeFactory(
-            instance,
-            relaxation,
+            instance=instance,
+            relaxation=relaxation,
+            heuristics=heuristics,
             on_new_node=self.progress_tracker.on_new_node_in_tree,
         )
 
@@ -100,7 +101,7 @@ class BnBSearch:
             return node.status
 
         # 4. Heuristic improvement: generate extra feasible solutions
-        for heur_sol in self.heuristics.search(self.instance, node):
+        for heur_sol in self.heuristics.search(self.instance, node.relaxed_solution):
             # heur_sol must be feasible; pool enforces validity
             self.solutions.add(heur_sol)
             self.progress_tracker.on_heuristic_solution(node, heur_sol)
@@ -153,6 +154,11 @@ class BnBSearch:
                 <= self.solutions.best_solution_value()
             ):
                 logging.info("Global prune at iteration %d", iteration)
+                for pruned_node in self.search_strategy.nodes_in_queue():
+                    pruned_node.status = NodeStatus.PRUNED
+                    self.progress_tracker.on_node_pruned(
+                        pruned_node, self.solutions.best_solution()
+                    )
                 break
 
         else:

@@ -1,4 +1,3 @@
-import networkx as nx
 import math
 
 from data_schema import Solution, Donation
@@ -31,7 +30,7 @@ class CrossoverTransplantSolver:
 
         for donor in self.donors:
             compatible_recipients = self.database.get_compatible_recipients(donor)
-            # Constraint 0: keine uncompatible Donation (debugging)
+            # Constraint 0: keine uncompatible Donation (debugging - zu langsam)
             for recipient in self.recipients:
                 if recipient not in compatible_recipients:
                     self.model.add(self.x[(donor.id, recipient.id)] == 0)

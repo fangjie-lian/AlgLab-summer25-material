@@ -24,8 +24,8 @@ so that:
 
 import abc
 
-from .instance import Instance
 from .branching_decisions import BranchingDecisions
+from .instance import Instance
 from .relaxed_solution import RelaxedSolution
 
 

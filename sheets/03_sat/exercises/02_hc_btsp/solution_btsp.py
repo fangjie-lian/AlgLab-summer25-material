@@ -6,7 +6,6 @@ import bisect
 import networkx as nx
 from _timer import Timer
 from solution_hamiltonian import HamiltonianCycleModel
-from pysat.solvers import Solver as SATSolver
 
 
 # Configure logging to show INFO messages
@@ -52,7 +51,9 @@ class BottleneckTSPSolver:
         edges_with_weight = [
             e for e in graph.edges(data="weight") if e[2] is not None
         ]  # (edge, weight) = (u, v, weight)
-        self.sorted_edge = sorted(edges_with_weight, key=lambda e: e[2]) # e[2] is weight of the edge e
+        self.sorted_edge = sorted(
+            edges_with_weight, key=lambda e: e[2]
+        )  # e[2] is weight of the edge e
         self._solution: list[tuple[int, int]] | None = None
         self._tmp_solution: list[tuple[int, int]] | None = None
         # Log initialization completion
@@ -104,9 +105,9 @@ class BottleneckTSPSolver:
         #         for i in range(len(weights)):
         #             if i != 0:
         #                 edges_false = [(u, v, w) for (u, v, w) in self.sorted_edge[index + 1 :]]
-        #                 self._tmp_solution = self.model.solve(edges_false)
+        #                 self._tmp_solution = HamiltonianCycleModel(self.graph).solve(edges_false)
         #             else:
-        #                 self._tmp_solution = self.model.solve()
+        #                 self._tmp_solution = HamiltonianCycleModel(self.graph).solve()
         #             if self._tmp_solution is None:
         #                 continue
         #             self._solution = self._tmp_solution

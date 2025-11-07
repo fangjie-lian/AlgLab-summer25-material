@@ -12,11 +12,13 @@ You will not modify this file directly; instead, focus on supplying your own
 """
 
 from __future__ import annotations
+
 from enum import Enum
 from typing import Callable, Optional
 
-from .instance import Instance
 from .branching_decisions import BranchingDecisions
+from .heuristics import Heuristics, HeuristicSolution
+from .instance import Instance
 from .relaxation import RelaxationSolver, RelaxedSolution
 
 
@@ -50,6 +52,7 @@ class BnBNode:
     """
 
     __slots__ = (
+        "_heuristic_solution",
         "_relaxed_solution",
         "_branching_decisions",
         "depth",
@@ -67,6 +70,7 @@ class BnBNode:
         parent_id: Optional[int] = None,
     ) -> None:
         # Store private copies to prevent external mutation
+        self._heuristic_solution: HeuristicSolution | None = None
         self._relaxed_solution = relaxed_solution.copy()
         self._branching_decisions = branching_decisions.copy()
         self.depth = depth
@@ -80,6 +84,19 @@ class BnBNode:
 
     def __eq__(self, other: object) -> bool:
         return isinstance(other, BnBNode) and self.node_id == other.node_id
+
+    @property
+    def heuristic_solution(self) -> HeuristicSolution | None:
+        """
+        Return a copy of the heuristic solution to avoid in-place edits.
+        """
+        if self._heuristic_solution is None:
+            return None
+        return self._heuristic_solution.copy()
+
+    @heuristic_solution.setter
+    def heuristic_solution(self, heuristic_solution: HeuristicSolution | None) -> None:
+        self._heuristic_solution = heuristic_solution
 
     @property
     def relaxed_solution(self) -> RelaxedSolution:
@@ -103,6 +120,7 @@ class NodeFactory:
     Args:
         instance: your Knapsack problem instance.
         relaxation: a RelaxationSolver to compute upper bounds.
+        heuristics: a Heuristics instance to generate feasible solutions.
         on_new_node: callback invoked after each node creation (e.g. for logging).
     """
 
@@ -110,10 +128,12 @@ class NodeFactory:
         self,
         instance: Instance,
         relaxation: RelaxationSolver,
+        heuristics: Heuristics,
         on_new_node: Callable[[BnBNode], None],
     ) -> None:
         self._instance = instance
         self._relaxation = relaxation
+        self._heuristics = heuristics
         self._on_new_node = on_new_node
         self._node_counter = 0
 
@@ -122,14 +142,19 @@ class NodeFactory:
         Create the root node with no fixations (all decisions None).
         """
         initial_decisions = BranchingDecisions(len(self._instance.items))
-        solution = self._relaxation.solve(self._instance, initial_decisions)
+        relaxed_solution = self._relaxation.solve(self._instance, initial_decisions)
         root = BnBNode(
-            relaxed_solution=solution,
+            relaxed_solution=relaxed_solution,
             branching_decisions=initial_decisions,
             depth=0,
             node_id=self._node_counter,
             parent_id=None,
         )
+        heuristic_solutions = self._heuristics.search(self._instance, relaxed_solution)
+        root.heuristic_solution = (
+            heuristic_solutions[0] if heuristic_solutions else None
+        )
+
         self._node_counter += 1
         self._on_new_node(root)
         return root
@@ -140,14 +165,19 @@ class NodeFactory:
 
         Depth is parent.depth+1; `parent_id` is parent.node_id.
         """
-        solution = self._relaxation.solve(self._instance, decisions)
+        relaxed_solution = self._relaxation.solve(self._instance, decisions)
         child = BnBNode(
-            relaxed_solution=solution,
+            relaxed_solution=relaxed_solution,
             branching_decisions=decisions,
             depth=parent.depth + 1,
             node_id=self._node_counter,
             parent_id=parent.node_id,
         )
+        heuristic_solutions = self._heuristics.search(self._instance, relaxed_solution)
+        child.heuristic_solution = (
+            heuristic_solutions[0] if heuristic_solutions else None
+        )
+
         self._node_counter += 1
         self._on_new_node(child)
         return child

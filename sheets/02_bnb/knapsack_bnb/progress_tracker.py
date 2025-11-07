@@ -11,10 +11,11 @@ from datetime import datetime
 from typing import Optional
 
 from .bnb_nodes import BnBNode, NodeStatus
+from .heuristics import HeuristicSolution
+from .instance import Instance
 from .search_strategy import SearchStrategy
 from .solutions import SolutionPool
 from .visualization import BnBVisualization
-from .relaxation import RelaxedSolution
 
 
 class ProgressTracker:
@@ -29,7 +30,7 @@ class ProgressTracker:
 
     def __init__(
         self,
-        instance,
+        instance: Instance,
         search_strategy: SearchStrategy,
         solutions: SolutionPool,
     ) -> None:
@@ -42,7 +43,6 @@ class ProgressTracker:
         self.num_iterations = 0
         self._nodes_created = 0
         self._current_node: Optional[BnBNode] = None
-        self._heuristic_sols: list[RelaxedSolution] = []
 
     def upper_bound(self) -> float:
         """Global upper bound = max(queue UB, best known feasible LB)."""
@@ -59,15 +59,21 @@ class ProgressTracker:
         self._nodes_created += 1
         self._vis.on_new_node_in_tree(node)
 
-    def on_heuristic_solution(self, node: BnBNode, sol: RelaxedSolution) -> None:
+    def on_heuristic_solution(self, node: BnBNode, sol: HeuristicSolution) -> None:
         """Called when a heuristic finds a new feasible solution."""
         if not sol.is_integral() or not sol.does_obey_capacity_constraint():
             raise ValueError(f"Invalid heuristic solution: {sol}")
-        if sol.value() >= self._solutions.best_solution_value():
-            self._heuristic_sols.append(sol)
-            print(
-                f"[Heuristic] node {node.node_id} -> new feasible solution {sol} (value={sol.value():.3f})"
-            )
+        # if sol.value() >= self._solutions.best_solution_value():
+        node.heuristic_solution = sol
+        print(
+            f"[Heuristic] node {node.node_id} -> new feasible solution {sol} (value={sol.value():.3f})"
+        )
+
+    def on_node_pruned(
+        self, node: BnBNode, best_solution: HeuristicSolution | None
+    ) -> None:
+        """Called whenever a node is pruned."""
+        self._vis.on_node_pruned(node, best_solution)
 
     def start_search(self) -> None:
         """Initialize search reporting and print header."""
@@ -105,11 +111,9 @@ class ProgressTracker:
             lb=lb,
             ub=ub,
             best_solution=self._solutions.best_solution(),
-            heuristic_solutions=self._heuristic_sols,
         )
         # reset per-iteration data
         self._current_node = None
-        self._heuristic_sols.clear()
 
     def end_search(self) -> None:
         """Finalize reporting and output summary and visualization."""
@@ -124,5 +128,7 @@ class ProgressTracker:
         if duration:
             print(f"Elapsed time: {duration}.")
         # write visualization
-        ts = datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")
-        self._vis.visualize(f"bnb_tree_{ts}.html")
+        ts = datetime.now().strftime("%Y-%m-%d_%Hh-%Mm-%Ss")
+        self._vis.visualize(
+            self._solutions.best_solution(), f"bnb-{self._instance.id}_{ts}.html"
+        )

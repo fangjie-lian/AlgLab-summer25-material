@@ -1,4 +1,5 @@
 import logging
+
 from knapsack_bnb import BnBSearch
 from knapsack_bnb.branching_strategy import (
     MyBranchingStrategy,
@@ -27,9 +28,10 @@ logging.basicConfig(
 
 def run_first_instance():
     logging.info(
-        "Running first instance. You should try to tune the BnBSearch to get below 50 iterations."
+        "Running first instance. You should try to tune the BnBSearch to get below 10 iterations."
     )
     instance = Instance(
+        id=1,
         items=[
             Item(weight=1, value=1),
             Item(weight=2, value=1),
@@ -74,6 +76,7 @@ def run_second_instance():
         "Running second instance. You should try to tune the BnBSearch to get below 10 iterations."
     )
     instance = Instance(
+        id=2,
         items=[
             Item(weight=1, value=10),
             Item(weight=2, value=10),
@@ -119,6 +122,7 @@ def run_third_instance():
         "Running third instance. You should try to tune the BnBSearch to get below 30 iterations."
     )
     instance = Instance(
+        id=3,
         items=[
             Item(weight=1, value=10),
             Item(weight=3, value=15),

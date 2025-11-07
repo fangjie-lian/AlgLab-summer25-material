@@ -24,6 +24,7 @@ def get_edge_weight(weighted_graph: ProblemInstance, u: str, v: str) -> int:
     raise KeyError(f"Edge {u} - {v} not found in the graph")
 """
 
+
 def build_weighted_graph(instance: ProblemInstance) -> nx.Graph:
     """Build a NetworkX graph from the problem instance so we can use its shortest path implementation."""
     logging.info(
@@ -38,8 +39,24 @@ def build_weighted_graph(instance: ProblemInstance) -> nx.Graph:
         G.add_node(vertex)
 
     # Add edges with weights to the graph
+    # Änderung nutze connections anstatt O(n^k) Schleife zu machen
     for edge in instance.connections:
         G.add_edge(edge.endpoint_a, edge.endpoint_b, weight=edge.distance)
+
+    # for v in instance.endpoints:
+    #     for w in instance.endpoints:
+    #         if v != w:  # Ensure not to check the same node
+    #             # Check if there is an edge between v and w
+    #             if any(
+    #                 edge.endpoint_a == v and edge.endpoint_b == w
+    #                 for edge in instance.connections
+    #             ) or any(
+    #                 edge.endpoint_a == w and edge.endpoint_b == v
+    #                 for edge in instance.connections
+    #             ):
+    #                 # Get the weight of the edge and add it to the graph
+    #                 weight = get_edge_weight(instance, v, w)
+    #                 G.add_edge(v, w, weight=weight)
 
     return G
 
@@ -69,10 +86,10 @@ class MaxPlacementsSolver:
         self._set_objective()
         logging.info("Finished building the model")
 
-    # Änderung: position: außerhalb der Klasse -> in der Klasse
+    # Änderung: position: außerhalb der Klasse -> in der Klasse (um self zu ergreifen)
     def distance(self, u: str, v: str) -> int:
         """Calculate the shortest path distance between two endpoints in the network."""
-        # Änderung: gelöscht: jedesmal den Graph abzubauen
+        # Änderung: gelöscht: jedesmal den Graph abzubauen - das Graph ist immer dasgleiche
         if (u, v) in self.distance_map:
             return self.distance_map[(u, v)]
         self.distance_map[(u, v)] = nx.shortest_path_length(
@@ -80,6 +97,9 @@ class MaxPlacementsSolver:
         )
         self.distance_map[(v, u)] = self.distance_map[(u, v)]
         return self.distance_map[(u, v)]
+
+        # graph = build_weighted_graph(instance)
+        # return nx.shortest_path_length(graph, u, v, weight="weight")
 
     def _add_distance_constraints(self):
         """Add constraints to ensure selected endpoints are not too close."""
@@ -95,7 +115,7 @@ class MaxPlacementsSolver:
                 if endpoint1 < endpoint2:
                     self.model.Add(
                         self.vars[endpoint1] + self.vars[endpoint2] <= 1
-                    )  # nicht gleichzeitig in Lsgsmenge
+                    )  # nicht gleichzeitig in der Lsgsmenge
 
         """ Änderung: zu langsam
         for endpoint1, endpoint2 in itertools.combinations(

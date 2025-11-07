@@ -12,6 +12,7 @@ You should ensure your relaxation solver produces RelaxedSolution objects that:
 """
 
 from typing import Sequence
+
 from .instance import Instance
 
 

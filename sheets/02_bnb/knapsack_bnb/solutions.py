@@ -9,6 +9,7 @@ You do not need to modify this file; it validates and stores your solutions.
 
 from typing import Optional, List
 from .relaxation import RelaxedSolution
+from .heuristics import HeuristicSolution
 
 
 class SolutionPool:
@@ -23,10 +24,10 @@ class SolutionPool:
     """
 
     def __init__(self) -> None:
-        self._solutions: List[RelaxedSolution] = []
-        self._best_solution: Optional[RelaxedSolution] = None
+        self._solutions: List[HeuristicSolution] = []
+        self._best_solution: Optional[HeuristicSolution] = None
 
-    def add(self, solution: RelaxedSolution) -> None:
+    def add(self, solution: HeuristicSolution) -> None:
         """
         Add a new feasible integral solution to the pool.
 
@@ -61,7 +62,7 @@ class SolutionPool:
             else float("-inf")
         )
 
-    def best_solution(self) -> Optional[RelaxedSolution]:
+    def best_solution(self) -> Optional[HeuristicSolution]:
         """
         Return the best solution, or None if no solution was added.
         """

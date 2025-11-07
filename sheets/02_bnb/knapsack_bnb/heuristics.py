@@ -10,11 +10,29 @@ You can implement heuristics by subclassing `Heuristics` and overriding `search(
 `search` should yield zero or more feasible `RelaxedSolution` objects.
 """
 
+import math
 from abc import ABC, abstractmethod
-from typing import Iterable, Tuple
+from typing import Tuple
 
-from .bnb_nodes import BnBNode, RelaxedSolution
 from .instance import Instance
+from .relaxed_solution import RelaxedSolution
+
+
+class HeuristicSolution(RelaxedSolution):
+    """
+    A feasible heuristic solution.
+    Inherits from `RelaxedSolution` for compatibility with the rest of the codebase.
+    """
+
+    def copy(self) -> "HeuristicSolution":
+        """
+        Return a deep copy of this heuristic solution.
+        """
+        return HeuristicSolution(
+            self.instance,
+            list(self.selection),
+            self.upper_bound,
+        )
 
 
 class Heuristics(ABC):
@@ -25,9 +43,11 @@ class Heuristics(ABC):
     """
 
     @abstractmethod
-    def search(self, instance: Instance, node: BnBNode) -> Iterable[RelaxedSolution]:
+    def search(
+        self, instance: Instance, relaxed: RelaxedSolution
+    ) -> Tuple[HeuristicSolution, ...]:
         """
-        Return an iterable of feasible `RelaxedSolution` objects for pruning.
+        Return a tuple of feasible `HeuristicSolution` objects for pruning.
         """
         ...
 
@@ -40,28 +60,27 @@ class MyHeuristic(Heuristics):
     if it is already feasible (integral and within capacity).
     """
 
-    def search(self, instance: Instance, node: BnBNode) -> Tuple[RelaxedSolution, ...]:
-        # Maybe we can also obtain a feasible solution from fractional solutions?
-        # It doesn't have to be perfect...
-        solutions = []
-        if (
-            node.relaxed_solution.does_obey_capacity_constraint()
-            and node.relaxed_solution.is_integral()
-        ):
-            # WARNING: Do not not modify the solution in place! Create a copy!
-            solutions.append(
-                node.relaxed_solution.copy()
-            )  # https://www.w3schools.com/python/ref_keyword_yield.asp
-        elif node.relaxed_solution.does_obey_capacity_constraint():  # Änderung
-            integral_solution = node.relaxed_solution.copy()
+    def search(
+        self, instance: Instance, relaxed: RelaxedSolution
+    ) -> Tuple[HeuristicSolution, ...]:
+        if relaxed.does_obey_capacity_constraint() and relaxed.is_integral():
+            heuristic_sol = HeuristicSolution(
+                instance, relaxed.selection, relaxed.upper_bound
+            )
+            return (heuristic_sol,)
+        elif relaxed.does_obey_capacity_constraint():  # Änderung
+            integral_solution = relaxed.copy()
             for i, x in enumerate(
                 integral_solution.selection
             ):  # falsch: for i in integral_solution.selection
                 if x > 0 and x < 1:
                     integral_solution.selection[i] = 0  # falsch: x = 0
                     break  # nur eine einzige x könnte fractional sein
-            solutions.append(integral_solution)
-        return tuple(solutions)
+            heuristic_sol = HeuristicSolution(
+                instance, integral_solution.selection, relaxed.upper_bound
+            )
+            return (heuristic_sol,)
+        return ()
 
 
 class MyHeuristic_integral(Heuristics):
@@ -72,14 +91,12 @@ class MyHeuristic_integral(Heuristics):
     if it is already feasible (integral and within capacity).
     """
 
-    def search(self, instance: Instance, node: BnBNode) -> Tuple[RelaxedSolution, ...]:
-        # Maybe we can also obtain a feasible solution from fractional solutions?
-        # It doesn't have to be perfect...
-        solutions = []
-        if (
-            node.relaxed_solution.does_obey_capacity_constraint()
-            and node.relaxed_solution.is_integral()
-        ):
-            # WARNING: Do not not modify the solution in place! Create a copy!
-            solutions.append(node.relaxed_solution.copy())
-        return tuple(solutions)
+    def search(
+        self, instance: Instance, relaxed: RelaxedSolution
+    ) -> Tuple[HeuristicSolution, ...]:
+        if relaxed.does_obey_capacity_constraint() and relaxed.is_integral():
+            heuristic_sol = HeuristicSolution(
+                instance, relaxed.selection, relaxed.upper_bound
+            )
+            return (heuristic_sol,)
+        return ()

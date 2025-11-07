@@ -80,7 +80,7 @@ class CycleLimitingCrossoverTransplantSolver:
                 sum(self.x[tuple(cycle)] for cycle in cycles_with_donor) <= 1
             )
 
-        # Constraint 3: cycle_lenth >= 2
+        # Constraint 3: cycle_lenth >= 2 (keine Donationen zwi Donor und Partner_Recipient)
         for cycle in self.cycles:
             if len(cycle) == 1:
                 self.model.add(self.x[tuple(cycle)] == 0)

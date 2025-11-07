@@ -50,7 +50,7 @@ class _EdgeVars:  # kopiert von example (node->edge)
         """
         Parse the selected edges from a given model (solution for a SAT-formula).
         """
-        return {self.edge(x)[0] for x in model if x > 0 and x in self._reverse} # x>0
+        return {self.edge(x)[0] for x in model if x > 0 and x in self._reverse}  # x>0
 
 
 def get_edge(edge: Edge):  # ein eindeutiger Ausdruck für eine Kante
@@ -83,7 +83,7 @@ class HamiltonianCycleModel:
             if self.graph.degree(v) < 2:
                 self.feasible = False
                 break
-        
+
         if self.feasible == True:
             self.edge_vars = _EdgeVars(graph)
             edge_list = [self.edge_vars.x(get_edge(e)) for e in graph.edges]
@@ -149,7 +149,7 @@ class HamiltonianCycleModel:
             "Starting Hamiltonian cycle search with %d assumptions",
             len(self.assumptions),
         )
-        
+
         # TODO: Implement me!
         if self.feasible == False:
             return None
@@ -185,9 +185,7 @@ class HamiltonianCycleModel:
                     for v in self.graph.neighbors(u):
                         if v not in comp:
                             choosed_edges.append(get_edge((u, v)))
-                # >=2 true
-                if len(choosed_edges) >= 2:
-                    self.solver.add_atmost(
-                        [-self.edge_vars.x(e) for e in choosed_edges],
-                        len(choosed_edges) - 2,
-                    )
+                # min. eine ausgehende Kante
+                self.solver.add_clause(
+                    [self.edge_vars.x(e) for e in choosed_edges],
+                )

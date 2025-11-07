@@ -42,6 +42,11 @@ class MultiKnapsackSolver:
                 self.x[j][i] * self.items[i].weight for i in range(len(self.items))
             )
             self.model.add(total_weight <= self.capacities[j])
+
+        # Constraint2: jedes Item wird nur max. 1 mal verwendet
+        for i in range(len(self.items)):
+            self.model.add(sum(self.x[j][i] for j in range(len(self.capacities))) <= 1)
+
         # Constraint3: toxic and non-toxic items cannot be packed together
         if self.activate_toxic == True:
             for j in range(len(self.capacities)):
@@ -54,8 +59,12 @@ class MultiKnapsackSolver:
                 # Effizienz
                 has_toxic = self.model.new_bool_var(f"has_toxic_{j}")
                 has_nontoxic = self.model.new_bool_var(f"has_nontoxic_{j}")
-                self.model.add_max_equality(has_toxic, [self.x[j][i] for i in toxic_index] or [0]) # has_toxic = max[...]
-                self.model.add_max_equality(has_nontoxic, [self.x[j][k] for k in nontoxic_index] or [0])
+                self.model.add_max_equality(
+                    has_toxic, [self.x[j][i] for i in toxic_index]
+                )  # has_toxic = max[x for all toxic_items]
+                self.model.add_max_equality(
+                    has_nontoxic, [self.x[j][k] for k in nontoxic_index]
+                )
                 self.model.add(has_toxic + has_nontoxic <= 1)
 
                 # for i in toxic_index:
@@ -72,9 +81,6 @@ class MultiKnapsackSolver:
                 #     self.model.add(
                 #         self.x[j][i] + self.x[j][k] <= 1
                 #     )
-        # Constraint2: jedes Item wird nur max. 1 mal verwendet
-        for i in range(len(self.items)):
-            self.model.add(sum(self.x[j][i] for j in range(len(self.capacities))) <= 1)
 
         # Zielfkt.
         total_value = []

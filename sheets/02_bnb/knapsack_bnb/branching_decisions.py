@@ -1,24 +1,26 @@
 class BranchingDecisions:
     """
-    Represents the branching decisions made during the branch and bound algorithm.
+    Represents the binary branching decisions made during the branch-and-bound algorithm.
 
     This class provides methods to initialize, access, fix, and split the branching decisions.
 
     Args:
-        length: Number of variables.
-
-    Returns:
-        None
+        length (int): Number of variables.
 
     Methods:
-        __getitem__(self, index): Get the value at the specified index.
-        fix(self, index, value): Fix the value at the specified index.
-        length(self): Get the length of the branching decisions. Equals the number of variables and is constant.
-        __iter__(self): Iterate over the branching decisions.
-        split_on(self, index): Split the branching decisions into two based on the specified index.
+        __getitem__(index) -> int 
+            Get the decision at `index`.
+        fix(index, value) -> None 
+            Fix the decision at `index` to `value`
+        length() -> int 
+            Get the length of the branching decisions. Equals the number of variables and is constant.
+        __iter__() -> Iterator[int | None]: 
+            Iterate over the branching decisions.
+        split_on(index) -> (BranchingDecisions, BranchingDecisions) 
+            Split the branching decisions into two based on the specified index.
     """
 
-    def __init__(self, length) -> None:
+    def __init__(self, length: int) -> None:
         self._assignments: list[int | None] = [None] * length
 
     def __getitem__(self, item_index: int) -> int | None:
@@ -46,6 +48,18 @@ class BranchingDecisions:
         copy = BranchingDecisions(len(self))
         copy._assignments = self._assignments.copy()
         return copy
+    
+    def included_items(self) -> list[int]:
+        """
+        Returns a list of fixed included items
+        """
+        return [idx for idx,assigned in enumerate(self._assignments) if assigned == 1]
+
+    def excluded_items(self) -> list[int]:
+        """
+        Returns a list of fixed excluded items
+        """
+        return [idx for idx,assigned in enumerate(self._assignments) if assigned == 0]
 
     def __len__(self) -> int:
         return len(self._assignments)

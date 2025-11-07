@@ -10,7 +10,7 @@ by supplying different priority functions.
 """
 
 import queue
-from typing import Callable, Iterator, Tuple, Any, override
+from typing import Callable, Iterator, Tuple, Any
 
 from .bnb_nodes import BnBNode
 
@@ -87,7 +87,6 @@ class SearchStrategy:
 # Default search order: you must supply your own `priority`.
 # This stub returns a constant key.
 
-
 # The node with the smallest priority value is selected first.
 # If two nodes have the same priority value, the one that was created first is selected first.
 # Maybe there is a better way than to do a first in first out?
@@ -104,3 +103,7 @@ def my_search_order(node: BnBNode) -> Any:
 
 def no_search_order(node: BnBNode) -> Any:
         return 1
+
+
+
+
