@@ -180,7 +180,6 @@ class HamiltonianCycleModel:
                 if len(comp) < 2:
                     continue
                 choosed_edges = []
-                # wie man es macht, ist wichtig
                 for u in comp:
                     for v in self.graph.neighbors(u):
                         if v not in comp:
